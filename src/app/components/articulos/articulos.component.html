@@ -99,18 +99,57 @@
               <input type="text" class="form-control" formControlName="intercambioDeseado"
                 placeholder="Ej: Bicicleta, Libros...">
             </div>
+
+            <!-- Subida de imágenes (reemplaza el campo de URLs) -->
             <div class="col-12">
-              <label class="form-label fw-semibold">URLs de imágenes</label>
-              <input type="text" class="form-control" formControlName="imagenes"
-                placeholder="URL1, URL2, ... (separadas por comas)">
-              <small class="text-muted">Separa múltiples URLs con comas</small>
+              <label class="form-label fw-semibold">Imágenes del artículo</label>
+
+              <div class="image-upload-zone"
+                   (click)="fileInput.click()"
+                   (dragover)="onDragOver($event)"
+                   (dragleave)="onDragLeave($event)"
+                   (drop)="onDrop($event)"
+                   [class.drag-over]="isDragging">
+                <input #fileInput type="file" accept="image/*" multiple (change)="onFilesSelected($event)">
+                <div class="upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                <p class="mb-1 fw-semibold" style="color: var(--color-2);">Arrastra imágenes aquí o haz clic para seleccionar</p>
+                <p class="text-muted small mb-0">PNG, JPG, WEBP — máx. 5 MB por imagen</p>
+              </div>
+
+              <!-- Previsualización -->
+              <div class="image-preview-grid" *ngIf="imagenesPreview.length > 0">
+                <div class="image-preview-item" *ngFor="let img of imagenesPreview; let i = index">
+                  <img [src]="img.url" [alt]="img.nombre">
+                  <button class="remove-img" type="button" (click)="eliminarImagen(i)">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Barra de progreso -->
+              <div *ngIf="subiendo" class="mt-2">
+                <div class="progress" style="height:6px; border-radius:4px;">
+                  <div class="progress-bar" [style.width.%]="progresoSubida"
+                       style="background: var(--color-2);"></div>
+                </div>
+                <small class="text-muted">Subiendo... {{ progresoSubida }}%</small>
+              </div>
+
+              <!-- URLs manuales como fallback -->
+              <div class="mt-2">
+                <small class="text-muted"><i class="bi bi-link-45deg me-1"></i>O agrega URLs directamente:</small>
+                <input type="text" class="form-control form-control-sm mt-1" formControlName="imagenesUrl"
+                  placeholder="https://ejemplo.com/imagen.jpg, https://...">
+              </div>
             </div>
+
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cerrarModal()">Cancelar</button>
-        <button type="submit" form="formArticulo" class="btn btn-primary" [disabled]="articuloForm.invalid || cargando">
+        <button type="submit" form="formArticulo" class="btn btn-primary"
+                [disabled]="articuloForm.invalid || cargando || subiendo">
           <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
           {{ editando ? 'Guardar cambios' : 'Crear artículo' }}
         </button>

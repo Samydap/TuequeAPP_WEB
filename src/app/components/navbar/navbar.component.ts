@@ -10,10 +10,17 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './navbar.component.html',
 })
 export class NavbarComponent {
+  sidebarCollapsed = false;
+
   constructor(public authService: AuthService, private router: Router) {}
 
   get usuario() {
     return this.authService.getUsuario();
+  }
+
+  toggleSidebar() {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
+    document.body.classList.toggle('sidebar-collapsed', this.sidebarCollapsed);
   }
 
   logout() {
