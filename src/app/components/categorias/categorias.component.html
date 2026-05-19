@@ -1,0 +1,85 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-0"><i class="bi bi-tags me-2 text-primary"></i>Categorías</h3>
+      <small class="text-muted">Gestiona las categorías de artículos</small>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCategoria" (click)="abrirModalNuevo()">
+      <i class="bi bi-plus-circle me-1"></i> Nueva categoría
+    </button>
+  </div>
+
+  <div class="table-responsive card shadow-sm border-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Creada</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="categorias.length > 0; else sinDatos">
+          <tr *ngFor="let cat of categorias">
+            <td class="fw-semibold">{{ cat.nombre }}</td>
+            <td class="text-muted">{{ cat.descripcion || '—' }}</td>
+            <td class="text-muted small">{{ cat.createdAt | date:'dd/MM/yyyy' }}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-primary me-1"
+                data-bs-toggle="modal" data-bs-target="#modalCategoria" (click)="editar(cat)">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="eliminar(cat._id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+        <ng-template #sinDatos>
+          <tr>
+            <td colspan="4" class="text-center text-muted py-4">
+              <i class="bi bi-tags fs-3 d-block mb-2"></i>No hay categorías registradas.
+            </td>
+          </tr>
+        </ng-template>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalCategoria" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-tag me-2"></i>{{ editando ? 'Editar categoría' : 'Nueva categoría' }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="cerrarModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="categoriaForm" id="formCategoria" (ngSubmit)="guardar()">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nombre <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="nombre" placeholder="Ej: Electrónica"
+              [class.is-invalid]="categoriaForm.get('nombre')?.invalid && categoriaForm.get('nombre')?.touched">
+            <div class="invalid-feedback">El nombre es requerido.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Descripción</label>
+            <textarea class="form-control" formControlName="descripcion" rows="2"
+              placeholder="Describe la categoría..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cerrarModal()">Cancelar</button>
+        <button type="submit" form="formCategoria" class="btn btn-primary" [disabled]="categoriaForm.invalid || cargando">
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
+          {{ editando ? 'Guardar cambios' : 'Crear categoría' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

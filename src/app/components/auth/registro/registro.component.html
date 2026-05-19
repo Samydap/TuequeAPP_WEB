@@ -1,0 +1,55 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light py-4">
+  <div class="card shadow-sm" style="width: 100%; max-width: 460px;">
+    <div class="card-body p-4">
+      <div class="text-center mb-4">
+        <span class="fs-2">🔄</span>
+        <h2 class="fw-bold mt-1 mb-0">TruequeApp</h2>
+        <p class="text-muted small">Crea tu cuenta gratuita</p>
+      </div>
+
+      <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Nombre completo <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" formControlName="nombre" placeholder="Tu nombre"
+            [class.is-invalid]="registroForm.get('nombre')?.invalid && registroForm.get('nombre')?.touched">
+          <div class="invalid-feedback">El nombre es obligatorio.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+          <input type="email" class="form-control" formControlName="email" placeholder="correo@ejemplo.com"
+            [class.is-invalid]="registroForm.get('email')?.invalid && registroForm.get('email')?.touched">
+          <div class="invalid-feedback">Ingresa un email válido.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Contraseña <span class="text-danger">*</span></label>
+          <input type="password" class="form-control" formControlName="password" placeholder="Mínimo 4 caracteres"
+            [class.is-invalid]="registroForm.get('password')?.invalid && registroForm.get('password')?.touched">
+          <div class="invalid-feedback">Mínimo 4 caracteres.</div>
+        </div>
+
+        <div class="row">
+          <div class="col-6 mb-3">
+            <label class="form-label fw-semibold">Teléfono</label>
+            <input type="text" class="form-control" formControlName="telefono" placeholder="Opcional">
+          </div>
+          <div class="col-6 mb-3">
+            <label class="form-label fw-semibold">Ciudad / Dirección</label>
+            <input type="text" class="form-control" formControlName="direccion" placeholder="Opcional">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 mt-1" [disabled]="registroForm.invalid || cargando">
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2"></span>
+          Crear cuenta
+        </button>
+      </form>
+
+      <hr class="my-3">
+      <p class="text-center text-muted small mb-0">
+        ¿Ya tienes cuenta? <a routerLink="/login" class="text-decoration-none fw-semibold">Inicia sesión</a>
+      </p>
+    </div>
+  </div>
+</div>

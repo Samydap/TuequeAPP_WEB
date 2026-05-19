@@ -1,0 +1,21 @@
+/* TruequeApp Global Styles */
+body {
+  background-color: #f8f9fa;
+}
+
+.object-fit-cover {
+  object-fit: cover;
+}
+
+.card {
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+}
+
+.navbar-brand {
+  font-size: 1.3rem;
+  letter-spacing: -0.3px;
+}

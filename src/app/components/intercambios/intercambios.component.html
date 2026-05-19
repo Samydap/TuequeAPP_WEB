@@ -1,0 +1,132 @@
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-0"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Intercambios</h3>
+      <small class="text-muted">Gestiona tus propuestas de trueque</small>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalPropuesta">
+      <i class="bi bi-plus-circle me-1"></i> Nueva propuesta
+    </button>
+  </div>
+
+  <!-- Lista de intercambios -->
+  <div class="row g-3" *ngIf="intercambios.length > 0; else sinIntercambios">
+    <div class="col-12" *ngFor="let itm of intercambios">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+            <div>
+              <span class="badge bg-{{ estadosBadge[itm.estado] }} me-2 text-uppercase">{{ itm.estado }}</span>
+              <small class="text-muted">{{ itm.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+              <!-- Botones para el receptor cuando está pendiente -->
+              <ng-container *ngIf="esReceptor(itm) && itm.estado === 'pendiente'">
+                <button class="btn btn-sm btn-success" (click)="responder(itm._id, 'aceptado')">
+                  <i class="bi bi-check-lg me-1"></i>Aceptar
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="responder(itm._id, 'rechazado')">
+                  <i class="bi bi-x-lg me-1"></i>Rechazar
+                </button>
+                <button class="btn btn-sm btn-primary" (click)="responder(itm._id, 'completado')">
+                  <i class="bi bi-check2-all me-1"></i>Completar
+                </button>
+              </ng-container>
+              <!-- Botón cancelar para el solicitante si está pendiente -->
+              <button *ngIf="esSolicitante(itm) && itm.estado === 'pendiente'"
+                class="btn btn-sm btn-outline-secondary" (click)="cancelar(itm._id)">
+                <i class="bi bi-x-circle me-1"></i>Cancelar
+              </button>
+            </div>
+          </div>
+
+          <div class="row mt-3 g-3">
+            <div class="col-md-5">
+              <div class="p-3 rounded bg-light">
+                <p class="text-muted small mb-1 fw-semibold">📤 ARTÍCULO OFRECIDO</p>
+                <p class="mb-0 fw-semibold">{{ itm.articuloOfrecido?.titulo }}</p>
+                <small class="text-muted">por {{ itm.solicitante?.nombre }}</small>
+              </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-center justify-content-center">
+              <i class="bi bi-arrow-left-right fs-3 text-primary"></i>
+            </div>
+            <div class="col-md-5">
+              <div class="p-3 rounded bg-light">
+                <p class="text-muted small mb-1 fw-semibold">📥 ARTÍCULO DESEADO</p>
+                <p class="mb-0 fw-semibold">{{ itm.articuloDeseado?.titulo }}</p>
+                <small class="text-muted">de {{ itm.receptor?.nombre }}</small>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="itm.mensaje" class="mt-2 p-2 bg-light rounded">
+            <small><i class="bi bi-chat-left-text me-1 text-muted"></i><em>{{ itm.mensaje }}</em></small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #sinIntercambios>
+    <div class="text-center py-5">
+      <i class="bi bi-arrow-left-right fs-1 text-muted"></i>
+      <p class="text-muted mt-2">No tienes intercambios registrados.</p>
+      <button class="btn btn-primary mt-1" data-bs-toggle="modal" data-bs-target="#modalPropuesta">
+        Crear primera propuesta
+      </button>
+    </div>
+  </ng-template>
+</div>
+
+<!-- Modal nueva propuesta -->
+<div class="modal fade" id="modalPropuesta" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="bi bi-arrow-left-right me-2"></i>Nueva propuesta de intercambio</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="propuestaForm" id="formPropuesta" (ngSubmit)="enviarPropuesta()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Tu artículo a ofrecer <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="articuloOfrecido"
+                [class.is-invalid]="propuestaForm.get('articuloOfrecido')?.invalid && propuestaForm.get('articuloOfrecido')?.touched">
+                <option value="">Selecciona tu artículo</option>
+                <option *ngFor="let art of misArticulos()" [value]="art._id">{{ art.titulo }}</option>
+              </select>
+              <div class="invalid-feedback">Selecciona un artículo tuyo.</div>
+              <small class="text-muted">Solo tus artículos disponibles</small>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Artículo que deseas <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="articuloDeseado"
+                [class.is-invalid]="propuestaForm.get('articuloDeseado')?.invalid && propuestaForm.get('articuloDeseado')?.touched">
+                <option value="">Selecciona el artículo</option>
+                <option *ngFor="let art of articulosDeOtros()" [value]="art._id">
+                  {{ art.titulo }} ({{ art.usuario?.nombre }})
+                </option>
+              </select>
+              <div class="invalid-feedback">Selecciona el artículo deseado.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Mensaje (opcional)</label>
+              <textarea class="form-control" formControlName="mensaje" rows="2"
+                placeholder="Escribe un mensaje para el receptor..."></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" form="formPropuesta" class="btn btn-primary"
+          [disabled]="propuestaForm.invalid || cargando">
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
+          Enviar propuesta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

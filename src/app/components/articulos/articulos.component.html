@@ -1,0 +1,120 @@
+<div class="container-fluid py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-0"><i class="bi bi-box-seam me-2 text-primary"></i>Artículos disponibles</h3>
+      <small class="text-muted">Explora y gestiona los artículos para intercambio</small>
+    </div>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalArticulo" (click)="abrirModalNuevo()">
+      <i class="bi bi-plus-circle me-1"></i> Nuevo artículo
+    </button>
+  </div>
+
+  <!-- Cards grid -->
+  <div class="row g-3" *ngIf="articulos.length > 0; else sinArticulos">
+    <div class="col-sm-6 col-md-4 col-lg-3" *ngFor="let art of articulos">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height:140px;">
+          <img *ngIf="art.imagenes?.length" [src]="art.imagenes[0]" alt="img"
+            class="h-100 w-100 object-fit-cover rounded-top" style="object-fit:cover;">
+          <i *ngIf="!art.imagenes?.length" class="bi bi-image text-secondary fs-1"></i>
+        </div>
+        <div class="card-body pb-2">
+          <div class="d-flex justify-content-between align-items-start mb-1">
+            <h6 class="card-title mb-0 fw-semibold">{{ art.titulo }}</h6>
+            <span class="badge bg-{{ badgeEstado(art.estado) }} ms-1">{{ art.estado }}</span>
+          </div>
+          <p class="card-text text-muted small mb-2">{{ art.descripcion }}</p>
+          <p class="mb-1 small"><i class="bi bi-tag me-1 text-primary"></i>{{ art.categoria?.nombre }}</p>
+          <p class="mb-1 small text-muted"><i class="bi bi-person me-1"></i>{{ art.usuario?.nombre }}</p>
+          <p *ngIf="art.intercambioDeseado" class="mb-0 small text-success">
+            <i class="bi bi-arrow-left-right me-1"></i>Desea: {{ art.intercambioDeseado }}
+          </p>
+        </div>
+        <div class="card-footer bg-transparent border-0 pt-0 pb-2" *ngIf="esPropio(art)">
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary flex-fill"
+              data-bs-toggle="modal" data-bs-target="#modalArticulo" (click)="editar(art)">
+              <i class="bi bi-pencil me-1"></i>Editar
+            </button>
+            <button class="btn btn-sm btn-outline-danger flex-fill" (click)="eliminar(art._id)">
+              <i class="bi bi-trash me-1"></i>Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #sinArticulos>
+    <div class="text-center py-5">
+      <i class="bi bi-inbox fs-1 text-muted"></i>
+      <p class="text-muted mt-2">No hay artículos disponibles aún.</p>
+    </div>
+  </ng-template>
+</div>
+
+<!-- Modal crear/editar -->
+<div class="modal fade" id="modalArticulo" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="bi bi-box-seam me-2"></i>{{ editando ? 'Editar artículo' : 'Nuevo artículo' }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="cerrarModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="articuloForm" id="formArticulo" (ngSubmit)="guardar()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Título <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="titulo" placeholder="Nombre del artículo"
+                [class.is-invalid]="articuloForm.get('titulo')?.invalid && articuloForm.get('titulo')?.touched">
+              <div class="invalid-feedback">El título es requerido (máx. 100 caracteres).</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Categoría <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="categoria"
+                [class.is-invalid]="articuloForm.get('categoria')?.invalid && articuloForm.get('categoria')?.touched">
+                <option value="">Selecciona una categoría</option>
+                <option *ngFor="let cat of categorias" [value]="cat._id">{{ cat.nombre }}</option>
+              </select>
+              <div class="invalid-feedback">Selecciona una categoría.</div>
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Descripción <span class="text-danger">*</span></label>
+              <textarea class="form-control" formControlName="descripcion" rows="2"
+                placeholder="Describe el artículo (máx. 100 caracteres)"
+                [class.is-invalid]="articuloForm.get('descripcion')?.invalid && articuloForm.get('descripcion')?.touched"></textarea>
+              <div class="invalid-feedback">La descripción es requerida.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Estado</label>
+              <select class="form-select" formControlName="estado">
+                <option *ngFor="let e of estadosDisponibles" [value]="e">{{ e | titlecase }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">¿Qué deseas a cambio?</label>
+              <input type="text" class="form-control" formControlName="intercambioDeseado"
+                placeholder="Ej: Bicicleta, Libros...">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">URLs de imágenes</label>
+              <input type="text" class="form-control" formControlName="imagenes"
+                placeholder="URL1, URL2, ... (separadas por comas)">
+              <small class="text-muted">Separa múltiples URLs con comas</small>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cerrarModal()">Cancelar</button>
+        <button type="submit" form="formArticulo" class="btn btn-primary" [disabled]="articuloForm.invalid || cargando">
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
+          {{ editando ? 'Guardar cambios' : 'Crear artículo' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
