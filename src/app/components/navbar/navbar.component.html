@@ -19,14 +19,23 @@
       <i class="bi bi-box-seam"></i>
       <span class="nav-label" *ngIf="!sidebarCollapsed">Artículos</span>
     </a>
-    <a class="nav-item" routerLink="/categorias" routerLinkActive="active">
-      <i class="bi bi-tags"></i>
-      <span class="nav-label" *ngIf="!sidebarCollapsed">Categorías</span>
-    </a>
+
     <a class="nav-item" routerLink="/intercambios" routerLinkActive="active">
       <i class="bi bi-arrow-left-right"></i>
       <span class="nav-label" *ngIf="!sidebarCollapsed">Intercambios</span>
     </a>
+
+    <!-- ── Enlace al Chat con badge de no leídos ── -->
+    <a class="nav-item position-relative" routerLink="/chat" routerLinkActive="active">
+      <i class="bi bi-chat-dots"></i>
+      <span class="nav-label" *ngIf="!sidebarCollapsed">Mensajes</span>
+      <span
+        class="badge rounded-pill bg-danger position-absolute"
+        style="top: 6px; right: 10px; font-size: 0.65rem;"
+        *ngIf="mensajesNoLeidos > 0"
+      >{{ mensajesNoLeidos }}</span>
+    </a>
+
     <a class="nav-item" routerLink="/usuarios" routerLinkActive="active">
       <i class="bi bi-people"></i>
       <span class="nav-label" *ngIf="!sidebarCollapsed">Usuarios</span>

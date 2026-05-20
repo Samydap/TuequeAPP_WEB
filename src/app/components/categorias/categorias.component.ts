@@ -46,43 +46,7 @@ export class CategoriasComponent implements OnInit {
     this.categoriaForm.reset();
   }
 
-  editar(cat: any) {
-    this.editando = true;
-    this.selectedId = cat._id;
-    this.categoriaForm.patchValue({ nombre: cat.nombre, descripcion: cat.descripcion || '' });
-  }
-
-  guardar() {
-    if (this.categoriaForm.invalid) return;
-    this.cargando = true;
-    const op = this.editando && this.selectedId
-      ? this.categoriaService.actualizar(this.selectedId, this.categoriaForm.value)
-      : this.categoriaService.crear(this.categoriaForm.value);
-
-    op.subscribe({
-      next: () => {
-        this.toastr.success(this.editando ? 'Categoría actualizada' : 'Categoría creada', 'Éxito');
-        this.cargarCategorias();
-        this.cerrarModal();
-        this.cargando = false;
-      },
-      error: (err) => {
-        this.toastr.error(err.error?.mensaje || 'Error al guardar', 'Error');
-        this.cargando = false;
-      }
-    });
-  }
-
-  eliminar(id: string) {
-    if (!confirm('¿Seguro que deseas eliminar esta categoría?')) return;
-    this.categoriaService.eliminar(id).subscribe({
-      next: () => {
-        this.toastr.success('Categoría eliminada', 'Éxito');
-        this.cargarCategorias();
-      },
-      error: (err) => this.toastr.error(err.error?.mensaje || 'Error al eliminar', 'Error')
-    });
-  }
+  
 
   cerrarModal() {
     this.editando = false;

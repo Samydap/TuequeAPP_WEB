@@ -4,5 +4,11 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug"
+  },
+  "/socket.io": {
+    "target": "http://localhost:4040",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true
   }
 }

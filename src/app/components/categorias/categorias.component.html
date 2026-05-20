@@ -1,12 +1,11 @@
+<!--
+
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h3 class="fw-bold mb-0"><i class="bi bi-tags me-2 text-primary"></i>Categorías</h3>
       <small class="text-muted">Gestiona las categorías de artículos</small>
     </div>
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCategoria" (click)="abrirModalNuevo()">
-      <i class="bi bi-plus-circle me-1"></i> Nueva categoría
-    </button>
   </div>
 
   <div class="table-responsive card shadow-sm border-0">
@@ -26,13 +25,6 @@
             <td class="text-muted">{{ cat.descripcion || '—' }}</td>
             <td class="text-muted small">{{ cat.createdAt | date:'dd/MM/yyyy' }}</td>
             <td class="text-center">
-              <button class="btn btn-sm btn-outline-primary me-1"
-                data-bs-toggle="modal" data-bs-target="#modalCategoria" (click)="editar(cat)">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger" (click)="eliminar(cat._id)">
-                <i class="bi bi-trash"></i>
-              </button>
             </td>
           </tr>
         </ng-container>
@@ -48,7 +40,7 @@
   </div>
 </div>
 
-<!-- Modal -->
+ Modal 
 <div class="modal fade" id="modalCategoria" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -59,19 +51,6 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="cerrarModal()"></button>
       </div>
       <div class="modal-body">
-        <form [formGroup]="categoriaForm" id="formCategoria" (ngSubmit)="guardar()">
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Nombre <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" formControlName="nombre" placeholder="Ej: Electrónica"
-              [class.is-invalid]="categoriaForm.get('nombre')?.invalid && categoriaForm.get('nombre')?.touched">
-            <div class="invalid-feedback">El nombre es requerido.</div>
-          </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Descripción</label>
-            <textarea class="form-control" formControlName="descripcion" rows="2"
-              placeholder="Describe la categoría..."></textarea>
-          </div>
-        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cerrarModal()">Cancelar</button>
@@ -83,3 +62,4 @@
     </div>
   </div>
 </div>
+--> 
