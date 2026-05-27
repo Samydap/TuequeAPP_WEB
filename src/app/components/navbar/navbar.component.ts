@@ -16,6 +16,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   sidebarCollapsed = false;
   mensajesNoLeidos = 0;
 
+  /** Se actualiza reactivamente vía foto$ BehaviorSubject */
+  fotoUrl = '';
+
   private subs = new Subscription();
 
   constructor(
@@ -25,6 +28,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Suscripción reactiva a cambios de foto de perfil
+    this.subs.add(
+      this.authService.foto$.subscribe(url => (this.fotoUrl = url))
+    );
+
     if (this.authService.estaAutenticado()) {
       this.conectarChat();
       this.iniciarPollingNoLeidos();
@@ -37,8 +45,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   private conectarChat(): void {
     this.chatService.conectar();
-
-    // Actualizar badge cuando llega notificación en tiempo real
     this.subs.add(
       this.chatService.onNotificacionMensaje().subscribe(() => {
         this.mensajesNoLeidos++;
@@ -47,7 +53,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   private iniciarPollingNoLeidos(): void {
-    // Cargar al inicio y cada 30 segundos
     this.cargarNoLeidos();
     this.subs.add(
       interval(30_000).pipe(

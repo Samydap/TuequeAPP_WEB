@@ -15,6 +15,11 @@
 
   <!-- Nav links (solo si autenticado) -->
   <nav class="sidebar-nav" *ngIf="authService.estaAutenticado()">
+    <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+      <i class="bi bi-speedometer2"></i>
+      <span class="nav-label" *ngIf="!sidebarCollapsed">Dashboard</span>
+    </a>
+
     <a class="nav-item" routerLink="/articulos" routerLinkActive="active">
       <i class="bi bi-box-seam"></i>
       <span class="nav-label" *ngIf="!sidebarCollapsed">Artículos</span>
@@ -25,7 +30,6 @@
       <span class="nav-label" *ngIf="!sidebarCollapsed">Intercambios</span>
     </a>
 
-    <!-- ── Enlace al Chat con badge de no leídos ── -->
     <a class="nav-item position-relative" routerLink="/chat" routerLinkActive="active">
       <i class="bi bi-chat-dots"></i>
       <span class="nav-label" *ngIf="!sidebarCollapsed">Mensajes</span>
@@ -45,12 +49,33 @@
   <!-- Footer: usuario + cerrar sesión -->
   <div class="sidebar-footer" *ngIf="authService.estaAutenticado()">
     <div class="user-info" *ngIf="!sidebarCollapsed">
-      <i class="bi bi-person-circle user-avatar-icon"></i>
+
+      <div class="user-avatar-container me-2">
+        <!-- fotoUrl se actualiza reactivamente vía BehaviorSubject sin recargar la página -->
+        <img
+          *ngIf="fotoUrl"
+          [src]="fotoUrl"
+          alt="Avatar Navbar"
+          class="rounded-circle border border-2 border-light shadow-sm"
+          style="width:36px;height:36px;object-fit:cover;display:block;"
+        >
+        <div
+          *ngIf="!fotoUrl"
+          class="rounded-circle bg-primary d-flex align-items-center justify-content-center shadow-sm"
+          style="width:36px;height:36px;"
+        >
+          <span class="text-white small fw-bold" style="font-size:14px;">
+            {{ usuario?.nombre?.[0]?.toUpperCase() || 'U' }}
+          </span>
+        </div>
+      </div>
+
       <div class="user-details">
         <span class="user-name">{{ usuario?.nombre }}</span>
         <span class="user-email">{{ usuario?.email }}</span>
       </div>
     </div>
+
     <button class="logout-btn" (click)="logout()" [title]="sidebarCollapsed ? 'Cerrar sesión' : ''">
       <i class="bi bi-box-arrow-right"></i>
       <span *ngIf="!sidebarCollapsed">Cerrar sesión</span>

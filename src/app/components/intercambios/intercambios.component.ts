@@ -5,11 +5,13 @@ import { ToastrService } from 'ngx-toastr';
 import { IntercambioService } from '../../services/intercambio.service';
 import { ArticuloService } from '../../services/articulo.service';
 import { AuthService } from '../../services/auth.service';
+import { ReviewComponent } from '../review/review.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-intercambios',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ReviewComponent],
   templateUrl: './intercambios.component.html',
 })
 export class IntercambiosComponent implements OnInit {
@@ -31,6 +33,7 @@ export class IntercambiosComponent implements OnInit {
     private authService: AuthService,
     private fb: FormBuilder,
     private toastr: ToastrService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {
     this.propuestaForm = this.fb.group({
@@ -124,4 +127,11 @@ export class IntercambiosComponent implements OnInit {
       error: (err) => this.toastr.error(err.error?.mensaje || 'Error', 'Error')
     });
   }
+  irAlChat(intercambio: any) {
+  const otro =
+    this.esSolicitante(intercambio)
+      ? intercambio.receptor?._id  || intercambio.receptor?.id
+      : intercambio.solicitante?._id || intercambio.solicitante?.id;
+  this.router.navigate(['/chat'], { queryParams: { usuarioId: otro } });
+}
 }

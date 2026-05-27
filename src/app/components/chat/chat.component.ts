@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ChatService, Conversacion, Mensaje } from '../../services/chat.service';
 import { AuthService } from '../../services/auth.service';
 import { UsuarioService } from '../../services/usuario.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-chat',
@@ -41,7 +42,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private authService: AuthService,
     private usuarioService: UsuarioService,
     private toastr: ToastrService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +51,19 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.chatService.conectar();
     this.cargarConversaciones();
     this.escucharEventosSocket();
+    this.route.queryParams.subscribe(params => {
+    if (params['usuarioId']) {
+      this.chatService.crearOObtenerConversacion(params['usuarioId']).subscribe({
+        next: (conv) => {
+          const existe = this.conversaciones.find(c => c._id === conv._id);
+          if (!existe) this.conversaciones = [conv, ...this.conversaciones];
+          this.abrirConversacion(conv);
+          this.cdr.detectChanges();
+        },
+        error: () => this.toastr.error('Error al abrir conversación')
+      });
+    }
+  });
   }
 
   ngAfterViewChecked(): void {

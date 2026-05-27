@@ -1,10 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
   private apiUri = '/api/usuarios';
+
+  /** Emite el usuario actualizado tras cada PUT exitoso */
+  private perfilActualizado$ = new Subject<any>();
+  perfilActualizado = this.perfilActualizado$.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -17,7 +22,11 @@ export class UsuarioService {
   }
 
   actualizar(id: string, data: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUri}/${id}`, data);
+    return this.http.put<any>(`${this.apiUri}/${id}`, data).pipe(
+      tap((res) => {
+        if (res?.usuario) this.perfilActualizado$.next(res.usuario);
+      })
+    );
   }
 
   eliminar(id: string): Observable<any> {

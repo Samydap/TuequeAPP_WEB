@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
-<main class="main-content">
+<app-navbar *ngIf="mostrarNavbar"></app-navbar>
+<main [class.main-content]="mostrarNavbar" [style.margin-left]="mostrarNavbar ? null : '0'" style="width:100%;min-height:100vh;">
   <router-outlet />
 </main>

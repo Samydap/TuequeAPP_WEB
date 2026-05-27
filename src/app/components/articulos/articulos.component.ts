@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ArticuloService } from '../../services/articulo.service';
 import { CategoriaService } from '../../services/categoria.service';
 import { AuthService } from '../../services/auth.service';
+import { UploadService } from '../../services/upload.service';
 
 interface ImagenPreview {
   url: string;
@@ -37,17 +38,18 @@ export class ArticulosComponent implements OnInit {
     private articuloService: ArticuloService,
     private categoriaService: CategoriaService,
     private authService: AuthService,
+    private uploadService: UploadService,
     private fb: FormBuilder,
     private toastr: ToastrService,
     private cdr: ChangeDetectorRef
   ) {
     this.articuloForm = this.fb.group({
-      titulo: ['', [Validators.required, Validators.maxLength(100)]],
-      descripcion: ['', [Validators.required, Validators.maxLength(100)]],
-      estado: ['bueno'],
-      categoria: ['', Validators.required],
+      titulo:             ['', [Validators.required, Validators.maxLength(100)]],
+      descripcion:        ['', [Validators.required, Validators.maxLength(100)]],
+      estado:             ['bueno'],
+      categoria:          ['', Validators.required],
       intercambioDeseado: [''],
-      imagenesUrl: ['']   // campo para URLs manuales (reemplaza al anterior "imagenes")
+      imagenesUrl:        ['']  // URLs manuales adicionales (opcional)
     });
   }
 
@@ -76,7 +78,7 @@ export class ArticulosComponent implements OnInit {
 
   esPropio(articulo: any): boolean {
     return articulo.usuario?._id === this.usuarioActual?.id ||
-           articulo.usuario?.id === this.usuarioActual?.id;
+           articulo.usuario?.id  === this.usuarioActual?.id;
   }
 
   // ─── Manejo de archivos ──────────────────────────────────────
@@ -86,7 +88,7 @@ export class ArticulosComponent implements OnInit {
     if (input.files) { this.agregarArchivos(Array.from(input.files)); input.value = ''; }
   }
 
-  onDragOver(event: DragEvent) { event.preventDefault(); this.isDragging = true; }
+  onDragOver(event: DragEvent)  { event.preventDefault(); this.isDragging = true; }
   onDragLeave(event: DragEvent) { event.preventDefault(); this.isDragging = false; }
 
   onDrop(event: DragEvent) {
@@ -115,6 +117,12 @@ export class ArticulosComponent implements OnInit {
     this.imagenesPreview.splice(index, 1);
   }
 
+  /**
+   * Procesa las imágenes:
+   *  1. URLs manuales del campo de texto
+   *  2. Imágenes ya guardadas (edición)
+   *  3. Archivos locales nuevos → se suben con UploadService (Cloudinary o disco)
+   */
   private async procesarImagenes(): Promise<string[]> {
     const urls: string[] = [];
 
@@ -128,32 +136,21 @@ export class ArticulosComponent implements OnInit {
     const existentes = this.imagenesPreview.filter(img => !img.file).map(img => img.url);
     urls.push(...existentes);
 
-    const archivosLocales = this.imagenesPreview.filter(img => img.file);
+    const archivosLocales = this.imagenesPreview.filter(img => !!img.file);
     if (archivosLocales.length === 0) return urls;
 
     this.subiendo = true;
-    this.progresoSubida = 0;
+    this.progresoSubida = 10;
+    this.cdr.detectChanges();
 
-    // Intenta subir al endpoint; si falla, convierte a base64
     try {
-      const formData = new FormData();
-      archivosLocales.forEach(img => formData.append('imagenes', img.file!, img.nombre));
-
-      const response = await fetch('/api/upload/imagenes', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${this.authService.getToken()}` },
-        body: formData
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        urls.push(...(data.urls || []));
-        this.progresoSubida = 100;
-      } else {
-        throw new Error('endpoint no disponible');
-      }
+      const files = archivosLocales.map(img => img.file!);
+      const data  = await this.uploadService.subirImagenesArticulo(files).toPromise();
+      urls.push(...(data?.urls || []));
+      this.progresoSubida = 100;
     } catch {
-      // Fallback base64
+      // Fallback a base64 si el endpoint falla
+      this.toastr.warning('No se pudo conectar con el servidor de imágenes, usando base64');
       for (let i = 0; i < archivosLocales.length; i++) {
         urls.push(await this.fileToBase64(archivosLocales[i].file!));
         this.progresoSubida = Math.round(((i + 1) / archivosLocales.length) * 100);
@@ -168,7 +165,7 @@ export class ArticulosComponent implements OnInit {
   private fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
+      reader.onload  = () => resolve(reader.result as string);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
@@ -189,10 +186,10 @@ export class ArticulosComponent implements OnInit {
     try {
       const imagenes = await this.procesarImagenes();
       const valor = {
-        titulo: this.articuloForm.value.titulo,
-        descripcion: this.articuloForm.value.descripcion,
-        estado: this.articuloForm.value.estado,
-        categoria: this.articuloForm.value.categoria,
+        titulo:             this.articuloForm.value.titulo,
+        descripcion:        this.articuloForm.value.descripcion,
+        estado:             this.articuloForm.value.estado,
+        categoria:          this.articuloForm.value.categoria,
         intercambioDeseado: this.articuloForm.value.intercambioDeseado,
         imagenes
       };
@@ -223,12 +220,12 @@ export class ArticulosComponent implements OnInit {
     this.editando = true;
     this.selectedId = articulo._id;
     this.articuloForm.patchValue({
-      titulo: articulo.titulo,
-      descripcion: articulo.descripcion,
-      estado: articulo.estado,
-      categoria: articulo.categoria?._id || articulo.categoria,
+      titulo:             articulo.titulo,
+      descripcion:        articulo.descripcion,
+      estado:             articulo.estado,
+      categoria:          articulo.categoria?._id || articulo.categoria,
       intercambioDeseado: articulo.intercambioDeseado || '',
-      imagenesUrl: ''
+      imagenesUrl:        ''
     });
     this.imagenesPreview = (articulo.imagenes || [])
       .filter((url: string) => url && !url.startsWith('data:'))
@@ -261,7 +258,7 @@ export class ArticulosComponent implements OnInit {
   }
 
   badgeEstado(estado: string): string {
-    const map: any = { nuevo: 'success', bueno: 'primary', regular: 'warning', malo: 'malo' };
+    const map: any = { nuevo: 'success', bueno: 'primary', regular: 'warning', malo: 'danger' };
     return map[estado] || 'secondary';
   }
 }

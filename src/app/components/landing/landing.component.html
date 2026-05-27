@@ -1,0 +1,504 @@
+<!-- ============================================================
+     TruequeApp — Landing Page Pública
+     ============================================================ -->
+<div class="landing-wrapper">
+
+  <!-- ── NAVBAR TOP (solo landing) ── -->
+  <header class="landing-nav">
+    <div class="landing-nav__brand">
+      <span class="landing-nav__icon">🔄</span>
+      <span class="landing-nav__name">TruequeApp</span>
+    </div>
+    <div class="landing-nav__actions">
+      <a *ngIf="!estaAutenticado" routerLink="/login" class="btn-nav-outline">Iniciar sesión</a>
+      <a *ngIf="!estaAutenticado" routerLink="/registro" class="btn-nav-solid">Registrarse</a>
+      <a *ngIf="estaAutenticado"  routerLink="/dashboard" class="btn-nav-solid">Ir al dashboard</a>
+    </div>
+  </header>
+
+  <!-- ── HERO ── -->
+  <section class="landing-hero">
+    <div class="landing-hero__content">
+      <span class="landing-hero__badge">✨ Intercambio sin dinero</span>
+      <h1 class="landing-hero__title">
+        Intercambia lo que<br>
+        <span class="landing-hero__highlight">ya no usas</span><br>
+        por lo que necesitas
+      </h1>
+      <p class="landing-hero__sub">
+        TruequeApp es la plataforma de trueque que conecta a personas que quieren
+        dar una segunda vida a sus objetos. Sin dinero, sin complicaciones:
+        publica tu artículo, encuentra lo que buscas y acuerda el intercambio.
+      </p>
+      <div class="landing-hero__cta">
+        <a routerLink="/registro" class="btn-hero-primary">Empieza gratis</a>
+        <a routerLink="/login"    class="btn-hero-secondary">Ya tengo cuenta</a>
+      </div>
+    </div>
+
+    <!-- Ilustración decorativa -->
+    <div class="landing-hero__visual" aria-hidden="true">
+      <div class="hero-blob">
+        <div class="hero-card hero-card--1">
+          <span class="hero-card__icon">📦</span>
+          <p class="hero-card__text">Publica tu artículo</p>
+        </div>
+        <div class="hero-arrow">🔄</div>
+        <div class="hero-card hero-card--2">
+          <span class="hero-card__icon">🎯</span>
+          <p class="hero-card__text">Encuentra lo que quieres</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── STATS ── -->
+  <section class="landing-stats">
+    <div class="stat-item">
+      <span class="stat-item__number">100%</span>
+      <span class="stat-item__label">Sin dinero</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-item__number">♻️</span>
+      <span class="stat-item__label">Economía circular</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-item__number">💬</span>
+      <span class="stat-item__label">Chat en tiempo real</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-item__number">⭐</span>
+      <span class="stat-item__label">Sistema de reseñas</span>
+    </div>
+  </section>
+
+  <!-- ── CÓMO FUNCIONA ── -->
+  <section class="landing-section">
+    <div class="landing-section__inner">
+      <p class="section-eyebrow">¿Cómo funciona?</p>
+      <h2 class="section-title">Tres pasos para tu primer trueque</h2>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-card__number">01</div>
+          <div class="step-card__icon">📸</div>
+          <h3 class="step-card__title">Publica tu artículo</h3>
+          <p class="step-card__desc">
+            Crea un anuncio con fotos, descripción y el estado del objeto.
+            Indica qué tipo de artículo te interesa a cambio.
+          </p>
+        </div>
+
+        <div class="step-connector" aria-hidden="true">→</div>
+
+        <div class="step-card">
+          <div class="step-card__number">02</div>
+          <div class="step-card__icon">🔍</div>
+          <h3 class="step-card__title">Explora y propón</h3>
+          <p class="step-card__desc">
+            Navega por los artículos disponibles, filtra por categoría y
+            envía una propuesta de intercambio a quien te interese.
+          </p>
+        </div>
+
+        <div class="step-connector" aria-hidden="true">→</div>
+
+        <div class="step-card">
+          <div class="step-card__number">03</div>
+          <div class="step-card__icon">🤝</div>
+          <h3 class="step-card__title">Acuerda y trueca</h3>
+          <p class="step-card__desc">
+            Usa el chat integrado para coordinar los detalles,
+            confirma el intercambio y deja una reseña al terminar.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ── -->
+  <section class="landing-section landing-section--alt">
+    <div class="landing-section__inner">
+      <p class="section-eyebrow">Funcionalidades</p>
+      <h2 class="section-title">Todo lo que necesitas para intercambiar</h2>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <span class="feature-card__icon">📦</span>
+          <h4 class="feature-card__title">Gestión de artículos</h4>
+          <p class="feature-card__desc">Publica, edita y elimina tus artículos con imágenes y categorías.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-card__icon">🔄</span>
+          <h4 class="feature-card__title">Intercambios</h4>
+          <p class="feature-card__desc">Propone, acepta o rechaza intercambios con seguimiento de estado.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-card__icon">💬</span>
+          <h4 class="feature-card__title">Chat en tiempo real</h4>
+          <p class="feature-card__desc">Habla directamente con otros usuarios con mensajes instantáneos.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-card__icon">⭐</span>
+          <h4 class="feature-card__title">Reseñas y reputación</h4>
+          <p class="feature-card__desc">Construye tu reputación con valoraciones de cada intercambio.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-card__icon">🏷️</span>
+          <h4 class="feature-card__title">Categorías</h4>
+          <p class="feature-card__desc">Encuentra fácilmente lo que buscas gracias al sistema de categorías.</p>
+        </div>
+
+        <div class="feature-card">
+          <span class="feature-card__icon">👤</span>
+          <h4 class="feature-card__title">Perfil personalizado</h4>
+          <p class="feature-card__desc">Gestiona tu perfil, foto y datos de contacto en un solo lugar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA FINAL ── -->
+  <section class="landing-cta">
+    <h2 class="landing-cta__title">¿Listo para tu primer trueque?</h2>
+    <p class="landing-cta__sub">
+      Únete gratis, publica tu primer artículo y descubre lo que otros tienen para ofrecer.
+    </p>
+    <a routerLink="/registro" class="btn-hero-primary btn-hero-primary--lg">Crear cuenta gratis</a>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="landing-footer">
+    <span class="landing-nav__icon">🔄</span>
+    <span class="landing-footer__name">TruequeApp</span>
+    <span class="landing-footer__copy">© {{ currentYear }} — Economía circular para todos</span>
+  </footer>
+
+</div>
+
+<!-- ============================================================
+     Estilos propios del landing (scoped inline)
+     ============================================================ -->
+<style>
+/* Reset y base */
+.landing-wrapper {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  background: #fff0ff;
+  color: #2d1540;
+}
+
+/* ── NAV ── */
+.landing-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #dbb6ee44;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.landing-nav__brand {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #4b1c71;
+}
+
+.landing-nav__icon { font-size: 1.4rem; }
+.landing-nav__actions { display: flex; gap: .75rem; align-items: center; }
+
+.btn-nav-outline {
+  padding: .45rem 1.1rem;
+  border: 2px solid #7f4ca5;
+  border-radius: 8px;
+  color: #7f4ca5;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .9rem;
+  transition: all .2s;
+}
+.btn-nav-outline:hover { background: #7f4ca5; color: #fff; }
+
+.btn-nav-solid {
+  padding: .45rem 1.1rem;
+  background: linear-gradient(135deg, #4b1c71, #7f4ca5);
+  border-radius: 8px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .9rem;
+  transition: opacity .2s;
+}
+.btn-nav-solid:hover { opacity: .88; color: #fff; }
+
+/* ── HERO ── */
+.landing-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 4rem 2rem 3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.landing-hero__content { flex: 1; }
+
+.landing-hero__badge {
+  display: inline-block;
+  background: #dbb6ee55;
+  color: #4b1c71;
+  border: 1px solid #b57edc;
+  border-radius: 100px;
+  padding: .3rem .9rem;
+  font-size: .82rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+}
+
+.landing-hero__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 1.1rem;
+  color: #2d1540;
+}
+
+.landing-hero__highlight {
+  background: linear-gradient(135deg, #4b1c71, #b57edc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.landing-hero__sub {
+  font-size: 1.05rem;
+  color: #5e3d7a;
+  max-width: 500px;
+  line-height: 1.65;
+  margin-bottom: 2rem;
+}
+
+.landing-hero__cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+.btn-hero-primary {
+  display: inline-block;
+  padding: .75rem 2rem;
+  background: linear-gradient(135deg, #4b1c71, #7f4ca5);
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 6px 24px rgba(75,28,113,.35);
+  transition: transform .2s, box-shadow .2s;
+}
+.btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(75,28,113,.45); color: #fff; }
+.btn-hero-primary--lg { padding: .85rem 2.5rem; font-size: 1.05rem; }
+
+.btn-hero-secondary {
+  display: inline-block;
+  padding: .75rem 2rem;
+  border: 2px solid #7f4ca5;
+  color: #7f4ca5;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: all .2s;
+}
+.btn-hero-secondary:hover { background: #7f4ca5; color: #fff; }
+
+/* Hero visual */
+.landing-hero__visual { flex: 0 0 auto; }
+
+.hero-blob {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  background: linear-gradient(135deg, #4b1c7115, #b57edc25);
+  border: 1px solid #dbb6ee;
+  border-radius: 24px;
+  padding: 2rem 1.5rem;
+}
+
+.hero-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem 1.2rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(75,28,113,.12);
+  min-width: 130px;
+}
+.hero-card__icon { font-size: 2.2rem; display: block; margin-bottom: .5rem; }
+.hero-card__text { font-size: .82rem; font-weight: 600; color: #4b1c71; margin: 0; }
+
+.hero-arrow { font-size: 1.8rem; color: #7f4ca5; }
+
+/* ── STATS ── */
+.landing-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  background: linear-gradient(135deg, #4b1c71, #7f4ca5);
+  padding: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .3rem;
+  padding: 0 3rem;
+}
+.stat-item__number { font-size: 1.6rem; font-weight: 800; color: #fff; }
+.stat-item__label  { font-size: .82rem; color: #dbb6ee; font-weight: 500; }
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,.25);
+}
+
+/* ── SECTIONS ── */
+.landing-section { padding: 4.5rem 2rem; }
+.landing-section--alt { background: #f3e6fb; }
+.landing-section__inner { max-width: 1100px; margin: 0 auto; }
+
+.section-eyebrow {
+  text-align: center;
+  font-size: .82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: #7f4ca5;
+  margin-bottom: .5rem;
+}
+
+.section-title {
+  text-align: center;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 800;
+  color: #2d1540;
+  margin-bottom: 3rem;
+}
+
+/* Steps */
+.steps-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.step-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  flex: 1;
+  min-width: 220px;
+  max-width: 280px;
+  box-shadow: 0 4px 20px rgba(75,28,113,.08);
+  border: 1px solid #dbb6ee55;
+  transition: transform .2s;
+}
+.step-card:hover { transform: translateY(-4px); }
+
+.step-card__number {
+  font-size: .75rem;
+  font-weight: 800;
+  color: #b57edc;
+  letter-spacing: .1em;
+  margin-bottom: .5rem;
+}
+.step-card__icon { font-size: 2.5rem; margin-bottom: .8rem; display: block; }
+.step-card__title { font-size: 1.05rem; font-weight: 700; color: #2d1540; margin-bottom: .6rem; }
+.step-card__desc  { font-size: .88rem; color: #5e3d7a; line-height: 1.6; margin: 0; }
+
+.step-connector { font-size: 1.8rem; color: #b57edc; flex: 0 0 auto; }
+
+/* Features */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.feature-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.6rem;
+  box-shadow: 0 2px 12px rgba(75,28,113,.07);
+  border: 1px solid #dbb6ee55;
+  transition: box-shadow .2s, transform .2s;
+}
+.feature-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(75,28,113,.13); }
+
+.feature-card__icon  { font-size: 2rem; display: block; margin-bottom: .7rem; }
+.feature-card__title { font-size: 1rem; font-weight: 700; color: #2d1540; margin-bottom: .4rem; }
+.feature-card__desc  { font-size: .87rem; color: #5e3d7a; line-height: 1.55; margin: 0; }
+
+/* ── CTA FINAL ── */
+.landing-cta {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: linear-gradient(135deg, #4b1c71, #7f4ca5);
+}
+.landing-cta__title {
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+.landing-cta__sub {
+  font-size: 1rem;
+  color: #dbb6ee;
+  max-width: 500px;
+  margin: 0 auto 2rem;
+  line-height: 1.65;
+}
+
+/* ── FOOTER ── */
+.landing-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  padding: 1.5rem;
+  background: #2d1540;
+  color: #b57edc;
+  font-size: .85rem;
+}
+.landing-footer__name { font-weight: 700; color: #dbb6ee; }
+.landing-footer__copy { color: #8a6aa0; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .landing-hero { flex-direction: column; text-align: center; padding: 2.5rem 1.5rem 2rem; }
+  .landing-hero__sub { max-width: 100%; }
+  .landing-hero__cta { justify-content: center; }
+  .landing-hero__visual { display: none; }
+  .stat-item { padding: 0 1.5rem; }
+  .stat-divider { display: none; }
+  .steps-grid { flex-direction: column; align-items: center; }
+  .step-connector { transform: rotate(90deg); }
+}
+</style>

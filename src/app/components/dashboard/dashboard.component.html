@@ -1,0 +1,297 @@
+<div class="container-fluid py-4 px-4">
+
+  <!-- Skeleton loader -->
+  <div *ngIf="cargando" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="text-muted mt-2">Cargando estadísticas...</p>
+  </div>
+
+
+  <!-- Error state -->
+  <div *ngIf="!cargando && error" class="text-center py-5">
+    <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size:2.5rem;"></i>
+    <p class="text-muted mt-3">No se pudieron cargar las estadísticas.<br>Verifica tu conexión o que el servidor esté activo.</p>
+  </div>
+
+  <ng-container *ngIf="!cargando && stats && !error">
+
+    <!-- Header -->
+    <div class="mb-4">
+      <h3 class="fw-bold mb-0" style="color: var(--color-1);">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+      </h3>
+      <small class="text-muted">Resumen general de la plataforma</small>
+    </div>
+
+    <!-- ── Tarjetas de totales ─────────────────────────────── -->
+    <div class="row g-3 mb-4">
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="stat-card" style="--accent: var(--color-2);">
+          <div class="stat-icon" style="background: rgba(127,76,165,0.12);">
+            <i class="bi bi-box-seam" style="color: var(--color-2);"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.totales.articulos }}</span>
+            <span class="stat-label">Artículos publicados</span>
+          </div>
+          <a routerLink="/articulos" class="stat-link">Ver todos <i class="bi bi-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="stat-card" style="--accent: #4b1c71;">
+          <div class="stat-icon" style="background: rgba(75,28,113,0.12);">
+            <i class="bi bi-people" style="color: #4b1c71;"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.totales.usuarios }}</span>
+            <span class="stat-label">Usuarios registrados</span>
+          </div>
+          <a routerLink="/usuarios" class="stat-link">Ver todos <i class="bi bi-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-lg-4">
+        <div class="stat-card" style="--accent: #b57edc;">
+          <div class="stat-icon" style="background: rgba(181,126,220,0.12);">
+            <i class="bi bi-arrow-left-right" style="color: #b57edc;"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value">{{ stats.totales.intercambios }}</span>
+            <span class="stat-label">Intercambios realizados</span>
+          </div>
+          <a routerLink="/intercambios" class="stat-link">Ver todos <i class="bi bi-arrow-right"></i></a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Gráficas ────────────────────────────────────────── -->
+    <div class="row g-3 mb-4">
+
+      <!-- Artículos por estado -->
+      <div class="col-md-6">
+        <div class="chart-card">
+          <h6 class="chart-title">
+            <i class="bi bi-bar-chart me-2" style="color: var(--color-2);"></i>
+            Artículos por estado
+          </h6>
+          <div class="chart-body">
+            <div *ngFor="let item of stats.articulosPorEstado; trackBy: trackByFn"
+                 class="bar-row mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="bar-label text-capitalize fw-semibold">{{ item._id }}</span>
+                <span class="bar-count">{{ item.total }} <small class="text-muted">({{ porcentajeEstado(item.total) }}%)</small></span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill"
+                     [style.width.%]="porcentajeEstado(item.total)"
+                     [style.background]="colorEstado(item._id)">
+                </div>
+              </div>
+            </div>
+            <p *ngIf="!stats.articulosPorEstado?.length" class="text-muted small text-center py-3">
+              Sin datos aún
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Artículos por categoría -->
+      <div class="col-md-6">
+        <div class="chart-card">
+          <h6 class="chart-title">
+            <i class="bi bi-tags me-2" style="color: var(--color-2);"></i>
+            Top categorías
+          </h6>
+          <div class="chart-body">
+            <div *ngFor="let item of stats.articulosPorCategoria; let i = index; trackBy: trackByFn"
+                 class="bar-row mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="bar-label fw-semibold">
+                  <span class="rank-badge me-1">{{ i + 1 }}</span>
+                  {{ item.nombre }}
+                </span>
+                <span class="bar-count">{{ item.total }}</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill"
+                     [style.width.%]="porcentajeCategoria(item.total)"
+                     style="background: linear-gradient(90deg, var(--color-1), var(--color-3));">
+                </div>
+              </div>
+            </div>
+            <p *ngIf="!stats.articulosPorCategoria?.length" class="text-muted small text-center py-3">
+              Sin datos aún
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Últimos artículos publicados ───────────────────── -->
+    <div class="chart-card">
+      <h6 class="chart-title">
+        <i class="bi bi-clock-history me-2" style="color: var(--color-2);"></i>
+        Últimos artículos publicados
+      </h6>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-header">
+            <tr>
+              <th>Artículo</th>
+              <th>Categoría</th>
+              <th>Usuario</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let art of stats.ultimosArticulos; trackBy: trackByFn">
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <img *ngIf="art.imagenes?.length"
+                       [src]="art.imagenes[0]" alt="img"
+                       class="rounded" style="width:36px;height:36px;object-fit:cover;">
+                  <div *ngIf="!art.imagenes?.length"
+                       class="rounded d-flex align-items-center justify-content-center"
+                       style="width:36px;height:36px;background:var(--color-5);">
+                    <i class="bi bi-image text-muted small"></i>
+                  </div>
+                  <span class="fw-semibold">{{ art.titulo }}</span>
+                </div>
+              </td>
+              <td><span class="badge-cat">{{ art.categoria?.nombre || '—' }}</span></td>
+              <td><i class="bi bi-person me-1 text-muted"></i>{{ art.usuario?.nombre || '—' }}</td>
+              <td><span [class]="badgeClass(art.estado)">{{ art.estado }}</span></td>
+              <td class="text-muted small">{{ art.createdAt | date:'dd/MM/yyyy' }}</td>
+            </tr>
+            <tr *ngIf="!stats.ultimosArticulos?.length">
+              <td colspan="5" class="text-center text-muted py-3">Sin artículos aún</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>
+
+<style>
+/* ── Stat cards ────────────────────────────── */
+.stat-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 12px rgba(75,28,113,0.08);
+  border-left: 4px solid var(--accent, var(--color-2));
+  transition: box-shadow 0.2s;
+  position: relative;
+  flex-wrap: wrap;
+}
+.stat-card:hover { box-shadow: 0 6px 20px rgba(75,28,113,0.15); }
+
+.stat-icon {
+  width: 52px; height: 52px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.stat-info {
+  flex: 1;
+  display: flex; flex-direction: column;
+}
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-1);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.82rem;
+  color: #888;
+  margin-top: 2px;
+}
+.stat-link {
+  font-size: 0.78rem;
+  color: var(--color-2);
+  text-decoration: none;
+  position: absolute;
+  bottom: 0.8rem;
+  right: 1rem;
+}
+.stat-link:hover { text-decoration: underline; }
+
+/* ── Chart cards ───────────────────────────── */
+.chart-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.4rem;
+  box-shadow: 0 2px 12px rgba(75,28,113,0.08);
+}
+.chart-title {
+  font-weight: 700;
+  color: var(--color-1);
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid #f0e6f7;
+  padding-bottom: 0.6rem;
+}
+.chart-body { padding: 0.2rem 0; }
+
+/* ── Bar chart ─────────────────────────────── */
+.bar-label { font-size: 0.85rem; color: #444; }
+.bar-count { font-size: 0.85rem; color: #555; }
+.bar-track {
+  height: 10px;
+  background: #f0e6f7;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Rank badge ────────────────────────────── */
+.rank-badge {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 20px; height: 20px;
+  background: var(--color-4);
+  color: var(--color-1);
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* ── Table ─────────────────────────────────── */
+.table-header th {
+  background: #f8f0fb;
+  color: var(--color-1);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: none;
+}
+.table td { font-size: 0.87rem; }
+
+.badge-cat {
+  background: var(--color-5);
+  color: var(--color-2);
+  border: 1px solid var(--color-4);
+  border-radius: 99px;
+  padding: 2px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+</style>

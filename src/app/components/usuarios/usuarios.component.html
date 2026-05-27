@@ -14,24 +14,34 @@
     <div class="col-sm-6 col-md-4 col-lg-3" *ngFor="let u of usuarios">
       <div class="card border-0 shadow-sm h-100" [class.border-primary]="esPropioUsuario(u)">
         <div class="card-body text-center py-4">
-          <div class="mb-3">
-            <img *ngIf="u.foto" [src]="u.foto" alt="foto" class="rounded-circle"
+
+          <!-- Avatar — usa campo `foto` persistido en BD -->
+          <div class="mb-3 d-flex justify-content-center">
+            <img *ngIf="u.foto" [src]="u.foto" alt="Avatar"
+              class="rounded-circle border shadow-sm"
               style="width:64px;height:64px;object-fit:cover;">
             <div *ngIf="!u.foto"
-              class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto"
+              class="rounded-circle bg-primary d-flex align-items-center justify-content-center shadow-sm"
               style="width:64px;height:64px;">
-              <span class="text-white fs-4 fw-bold">{{ u.nombre[0]?.toUpperCase() }}</span>
+              <span class="text-white fs-4 fw-bold">{{ u.nombre?.[0]?.toUpperCase() || 'U' }}</span>
             </div>
           </div>
+
           <h6 class="fw-bold mb-1">
             {{ u.nombre }}
             <span *ngIf="esPropioUsuario(u)" class="badge bg-primary ms-1 small">Tú</span>
           </h6>
           <p class="text-muted small mb-1">{{ u.email }}</p>
-          <p *ngIf="u.telefono" class="text-muted small mb-1"><i class="bi bi-telephone me-1"></i>{{ u.telefono }}</p>
+          <p *ngIf="u.telefono"  class="text-muted small mb-1"><i class="bi bi-telephone me-1"></i>{{ u.telefono }}</p>
           <p *ngIf="u.direccion" class="text-muted small mb-0"><i class="bi bi-geo-alt me-1"></i>{{ u.direccion }}</p>
 
-          <div *ngIf="esPropioUsuario(u)" class="mt-3 d-flex gap-2 justify-content-center">
+          <!-- Reputación persistida en BD -->
+          <div *ngIf="u.reputacion?.total > 0" class="mt-2">
+            <span class="text-warning fw-bold">★ {{ u.reputacion.promedio }}</span>
+            <small class="text-muted ms-1">({{ u.reputacion.total }} reseña{{ u.reputacion.total !== 1 ? 's' : '' }})</small>
+          </div>
+
+          <div *ngIf="esPropioUsuario(u)" class="mt-3 d-flex gap-2 justify-content-center flex-wrap">
             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalUsuario"
               (click)="editarPerfil()">
               <i class="bi bi-pencil me-1"></i>Editar
@@ -40,6 +50,13 @@
               <i class="bi bi-trash me-1"></i>Eliminar
             </button>
           </div>
+          <div class="mt-2">
+            <button class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalPerfil"
+              (click)="verPerfil(u)">
+              <i class="bi bi-star me-1"></i>Ver reseñas
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -53,7 +70,7 @@
   </ng-template>
 </div>
 
-<!-- Modal editar perfil -->
+<!-- ── Modal: Editar perfil ── -->
 <div class="modal fade" id="modalUsuario" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -62,6 +79,25 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="cerrarModal()"></button>
       </div>
       <div class="modal-body">
+
+        <!-- Vista previa avatar -->
+        <div class="text-center mb-4">
+          <img *ngIf="imagenesPreview.length > 0"
+            [src]="imagenesPreview[0].url" alt="Previsualización"
+            class="rounded-circle border border-3 border-primary shadow"
+            style="width:90px;height:90px;object-fit:cover;">
+          <img *ngIf="imagenesPreview.length === 0 && usuarioForm.get('foto')?.value"
+            [src]="usuarioForm.get('foto')?.value" alt="Previsualización URL"
+            class="rounded-circle border border-3 border-primary shadow"
+            style="width:90px;height:90px;object-fit:cover;">
+          <div *ngIf="imagenesPreview.length === 0 && !usuarioForm.get('foto')?.value"
+            class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto shadow"
+            style="width:90px;height:90px;">
+            <span class="text-white fs-2 fw-bold">{{ usuarioForm.get('nombre')?.value?.[0]?.toUpperCase() || 'U' }}</span>
+          </div>
+          <small class="text-muted d-block mt-2">Vista previa de tu avatar</small>
+        </div>
+
         <form [formGroup]="usuarioForm" id="formUsuario" (ngSubmit)="guardar()">
           <div class="mb-3">
             <label class="form-label fw-semibold">Nombre <span class="text-danger">*</span></label>
@@ -79,9 +115,47 @@
               <input type="text" class="form-control" formControlName="direccion" placeholder="Opcional">
             </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold">URL foto de perfil</label>
-            <input type="text" class="form-control" formControlName="foto" placeholder="https://...">
+
+          <!-- Zona Drag & Drop -->
+          <div class="col-12 mb-3">
+            <label class="form-label fw-semibold">Imagen de perfil</label>
+            <div class="image-upload-zone p-4 text-center border border-2 border-dashed rounded-3"
+                 (click)="fileInput.click()"
+                 (dragover)="onDragOver($event)"
+                 (dragleave)="onDragLeave($event)"
+                 (drop)="onDrop($event)"
+                 [class.drag-over]="isDragging"
+                 style="cursor:pointer;background-color:#f8f9fa;">
+              <input #fileInput type="file" accept="image/*" (change)="onFilesSelected($event)" style="display:none;">
+              <div class="upload-icon fs-2 text-primary mb-2"><i class="bi bi-cloud-arrow-up"></i></div>
+              <p class="mb-1 fw-semibold">Arrastra tu imagen aquí o haz clic para seleccionar</p>
+              <p class="text-muted small mb-0">PNG, JPG, WEBP — máx. 1 sola foto de perfil (5 MB)</p>
+            </div>
+
+            <div class="mt-3" *ngIf="imagenesPreview.length > 0">
+              <div class="d-flex align-items-center justify-content-between p-2 bg-light rounded border">
+                <div class="d-flex align-items-center gap-2">
+                  <img [src]="imagenesPreview[0].url" class="rounded" style="width:40px;height:40px;object-fit:cover;">
+                  <span class="text-truncate small fw-semibold" style="max-width:200px;">{{ imagenesPreview[0].nombre }}</span>
+                </div>
+                <button class="btn btn-sm btn-link text-danger p-0" type="button" (click)="eliminarImagen(0)">
+                  <i class="bi bi-trash fs-5"></i>
+                </button>
+              </div>
+            </div>
+
+            <div *ngIf="subiendo" class="mt-2">
+              <div class="progress" style="height:6px;border-radius:4px;">
+                <div class="progress-bar bg-success" [style.width.%]="progresoSubida"></div>
+              </div>
+              <small class="text-muted">Subiendo... {{ progresoSubida }}%</small>
+            </div>
+
+            <div class="mt-3">
+              <small class="text-muted"><i class="bi bi-link-45deg me-1"></i>O vincula una URL directa:</small>
+              <input type="text" class="form-control form-control-sm mt-1" formControlName="foto"
+                placeholder="https://ejemplo.com/mi-foto.jpg">
+            </div>
           </div>
         </form>
       </div>
@@ -91,6 +165,70 @@
           <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
           Guardar cambios
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Ver reseñas ── -->
+<div class="modal fade" id="modalPerfil" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" *ngIf="perfilSeleccionado">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title"><i class="bi bi-star me-2"></i>Perfil de {{ perfilSeleccionado.nombre }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="cerrarPerfil()"></button>
+      </div>
+      <div class="modal-body">
+
+        <div class="text-center mb-4" *ngIf="!cargandoReviews && reviewsData">
+          <div class="display-6 fw-bold text-warning">
+            {{ reviewsData.promedio > 0 ? reviewsData.promedio : '—' }}
+            <span class="fs-5 text-muted" *ngIf="reviewsData.promedio > 0">/ 5</span>
+          </div>
+          <div class="fs-3">
+            <span *ngFor="let s of estrellas(5)"
+              [class.text-warning]="s <= reviewsData.promedio"
+              [class.text-muted]="s > reviewsData.promedio">★</span>
+          </div>
+          <small class="text-muted">{{ reviewsData.total }} reseña{{ reviewsData.total !== 1 ? 's' : '' }}</small>
+        </div>
+
+        <div *ngIf="cargandoReviews" class="text-center py-4">
+          <div class="spinner-border text-warning"></div>
+        </div>
+
+        <div *ngIf="!cargandoReviews && reviewsData">
+          <div *ngIf="reviewsData.reviews.length === 0" class="text-center text-muted py-3">
+            <i class="bi bi-star fs-3"></i>
+            <p class="mt-2">Sin reseñas aún.</p>
+          </div>
+          <div *ngFor="let r of reviewsData.reviews" class="border-bottom py-3">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <img *ngIf="r.fromUser?.foto" [src]="r.fromUser.foto"
+                class="rounded-circle border"
+                style="width:32px;height:32px;object-fit:cover;flex-shrink:0;">
+              <div *ngIf="!r.fromUser?.foto"
+                class="rounded-circle bg-primary d-flex align-items-center justify-content-center"
+                style="width:32px;height:32px;flex-shrink:0;">
+                <span class="text-white small fw-bold">{{ r.fromUser?.nombre?.[0]?.toUpperCase() }}</span>
+              </div>
+              <div>
+                <span class="fw-semibold">{{ r.fromUser?.nombre }}</span>
+                <small class="text-muted ms-2">{{ r.createdAt | date:'dd/MM/yyyy' }}</small>
+              </div>
+              <div class="ms-auto">
+                <span *ngFor="let s of estrellas(5)"
+                  [class.text-warning]="s <= r.rating"
+                  [class.text-muted]="s > r.rating">★</span>
+              </div>
+            </div>
+            <p *ngIf="r.comment" class="mb-0 ms-5 text-muted fst-italic small">{{ r.comment }}</p>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cerrarPerfil()">Cerrar</button>
       </div>
     </div>
   </div>
